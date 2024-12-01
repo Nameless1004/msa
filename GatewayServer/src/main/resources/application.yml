@@ -25,10 +25,10 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: ms1
-          uri: http://localhost:8081
+        - id: auth
+          uri: http://localhost:8083
           predicates:
-            - Path=/ms1/**
+            - Path=/auth/**
           filters:
             - name: JwtAuthFilter
               args:

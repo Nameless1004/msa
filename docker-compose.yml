@@ -1,0 +1,35 @@
+services:
+  config:
+    build:
+      context: ./ConfigServer
+      dockerfile: Dockerfile
+    container_name: config-server
+    ports:
+      - 9001:9001
+  eureka:
+    build:
+      context: ./EurekaServer
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    depends_on:
+      - config
+    ports:
+      - 8761:8761
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: gateway-server
+    depends_on:
+      - eureka
+    ports:
+      - 9000:9000
+  auth:
+    build:
+      context: ./AuthServer
+      dockerfile: Dockerfile
+    container_name: auth-server
+    depends_on:
+      - eureka
+    ports:
+      - 8081:8081
