@@ -1,0 +1,37 @@
+server:
+  port: 9000
+management:
+  endpoint:
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: gateway
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url.defaultZone: http://admin:1234@localhost:8761/eureka
+
+spring:
+  application:
+    name: gateway
+  profiles:
+    active: dev
+  config:
+    import: optional:configserver:http://admin:1234@localhost:9001
+  cloud:
+    gateway:
+      routes:
+        - id: ms1
+          uri: http://localhost:8081
+          predicates:
+            - Path=/ms1/**
+          filters:
+            - name: JwtAuthFilter
+              args:
+                headerName: Authorization
+                granted: Bearer
+                roles: USER, ADMIN
