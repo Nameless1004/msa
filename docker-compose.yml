@@ -5,31 +5,59 @@ services:
       dockerfile: Dockerfile
     container_name: config-server
     ports:
-      - 9001:9001
+      - '9001:9001'
+    healthcheck:
+      test: "curl --fail --silent localhost:9001/actuator/health/readiness | grep UP || exit 1"
+      interval: 2s
+      timeout: 3s
+      retries: 5
+      start_period: 2s
+    env_file: 
+      - .env
   eureka:
     build:
       context: ./EurekaServer
       dockerfile: Dockerfile
     container_name: eureka-server
-    depends_on:
-      - config
+    healthcheck:
+      test: "curl --fail --silent localhost:8761/actuator/health | grep UP || exit 1"
+      interval: 2s
+      timeout: 3s
+      retries: 5
+      start_period: 2s
     ports:
-      - 8761:8761
+      - '8761:8761'
+    depends_on:
+      config:
+       condition: service_healthy
   gateway:
     build:
-      context: ./gateway
+      context: ./GatewayServer
       dockerfile: Dockerfile
     container_name: gateway-server
     depends_on:
-      - eureka
+      eureka:
+       condition: service_healthy
+    env_file:
+      - .env
     ports:
-      - 9000:9000
+      - '9000:9000'
   auth:
     build:
       context: ./AuthServer
       dockerfile: Dockerfile
     container_name: auth-server
     depends_on:
-      - eureka
+      eureka:
+       condition: service_healthy
+    env_file:
+      - .env
     ports:
-      - 8081:8081
+      - '8081:8081'
+  # db:
+  #   image: mysql
+  #   environment:
+  #     MYSQL_DATABASE: 'waity'
+  #     MYSQL_ROOT_PASSWORD: '0423'
+  #   ports:
+  #     - '3306:3306'
