@@ -47,7 +47,7 @@ public class User extends Timestamped {
     }
 
     public static User fromAuthUser(AuthUserDetails authUser) {
-        return new User(authUser.getUserId(), authUser.getEmail(), authUser.getRole());
+        return new User(authUser.getId(), authUser.getEmail(), authUser.getRole());
     }
 
     public void delete() {

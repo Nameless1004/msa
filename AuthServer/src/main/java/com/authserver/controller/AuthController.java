@@ -1,16 +1,17 @@
 package com.authserver.controller;
 
 import com.authserver.common.dto.ResponseDto;
+import com.authserver.dto.LoginRequest;
+import com.authserver.dto.LoginResponse;
 import com.authserver.dto.SignupRequest;
 import com.authserver.dto.SignupResponse;
+import com.authserver.security.AuthUser;
+import com.authserver.security.AuthUserDetails;
 import com.authserver.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -27,8 +28,16 @@ public class AuthController {
     }
 
     @GetMapping("/login")
-    public ResponseEntity<String> login() {
+    public ResponseEntity<ResponseDto<LoginResponse>> login(
+            @RequestBody LoginRequest loginRequest) {
 
-        return ResponseEntity.ok("test!!");
+        return ResponseDto.of(HttpStatus.OK, authService.login(loginRequest)).toEntity();
+    }
+
+    @DeleteMapping("/account")
+    public ResponseEntity<?> delete(
+            @AuthUser AuthUserDetails authUser) {
+        authService.deleteAccount(authUser);
+        return ResponseDto.of(HttpStatus.OK, "회원탈퇴에 성공하였습니다.").toEntity();
     }
 }
